@@ -1,0 +1,84 @@
+my @bsubs;
+my @subs;
+my @nsubs;
+my $i = 0;
+my $subs = 0;
+my @lines = split /\n/, $c;
+my $subsh = {};
+
+while (@lines) {
+  my $l = shift @lines;
+  if ($l =~ /^sub (.*) \{/) {
+    $subsh->{$1} = 1;
+    $subs = 1;
+    my $done = 0;
+    my @m;
+    push @m, $l;
+
+    # get the args right
+    my $x = shift @lines;
+    if ($x =~ /^\s*my (\S+) = .*$/) {
+      my $y = $1;
+      $y =~ s/^\(//;
+      $y =~ s/\)$//;
+      push @m, "  my (\$self,$y) = \@_;"
+    } else {
+      unshift @lines, $x;
+      push @m, "  my (\$self) = \@_;"
+    }
+    do {
+      my $l = shift @lines;
+      if ($l =~ /^\}/) {
+	push @m, $l;
+	$done = 1;
+      } else {
+	push @m, $l;
+      }
+    } while (@lines and ! $done);
+    push @subs, join("\n",@m) if @m;
+    $subs = join("\n",@lines);
+  } elsif ($subs) {
+    my $done = 0;
+    my @m;
+    do {
+      my $l = shift @lines;
+      if ($l =~ /^sub /) {
+	unshift @lines,$l;
+	$done = 1;
+      } elsif ($l =~ /^\}/) {
+	push @m, "  $l";
+	$done = 1;
+      } else {
+	push @m, "  $l";
+      }
+    } while (@lines and ! $done);
+    push @nsubs, join("\n",@m) if @m;
+  } else {
+    my $done = 0;
+    my @m;
+    push @m, $l;
+    do {
+      my $l = shift @lines;
+      if ($l =~ /^sub /) {
+	unshift @lines,$l;
+	$done = 1;
+      } elsif ($l =~ /^\}/) {
+	push @m, $l;
+	$done = 1;
+      } else {
+	push @m, $l;
+      }
+    } while (@lines and ! $done);
+    push @bsubs, join("\n",@m) if @m;
+  }
+}
+
+print Dumper({
+	      bsubs => \@bsubs,
+	      subs => \@subs,
+	      nsubs => \@nsubs,
+	      i => $i,
+	      subs => $subs,
+	      lines => \@lines,
+	      subsh => $subsh,
+	     }) if 0;

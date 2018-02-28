@@ -1,0 +1,27 @@
+$VAR1 = bless( {
+                 'readonly' => '',
+                 'children' => [
+                                 bless( {
+                                          'children' => [
+                                                          bless( {
+                                                                   'finish' => bless( {
+                                                                                        'content' => '}'
+                                                                                      }, 'PPI::Token::Structure' ),
+                                                                   'children' => [
+                                                                                   bless( {
+                                                                                            'content' => ' '
+                                                                                          }, 'PPI::Token::Whitespace' )
+                                                                                 ],
+                                                                   'start' => bless( {
+                                                                                       'content' => '{'
+                                                                                     }, 'PPI::Token::Structure' )
+                                                                 }, 'PPI::Structure::Constructor' )
+                                                        ]
+                                        }, 'PPI::Statement' ),
+                                 bless( {
+                                          'content' => '
+'
+                                        }, 'PPI::Token::Whitespace' )
+                               ],
+                 'tab_width' => 1
+               }, 'PPI::Document' );

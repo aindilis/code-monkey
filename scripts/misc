@@ -1,0 +1,5 @@
+my @items = qw ( Conf DBH PosHome PosVar PosSrc PosConf Debug_Mode_On
+	Shoppix_Demo_Mode_On Sourceforge_Mode_On Telnet_Server_Mode_On
+	ScannerDevice ScannerType InvoiceTemplateFile Invoice1File
+	SalesTemplateFile Sale1File Prompt StoreName Logged_On_User
+	CurrentMenu Print_Agent );

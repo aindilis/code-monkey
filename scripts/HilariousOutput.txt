@@ -1,0 +1,132 @@
+package Convert;
+
+# get rid of #!/usr/bin/perl -w
+# add the package title
+# create Execute if it doesn't exist
+# extract the real subs
+    # get the args right
+# now extract all the init stuff from bsubs, and nsubs
+# calculate titles
+# calculate attributes
+    # fix up the name
+# print Dumper({$self->Attributes});
+# move all expressions outside of subs into Execute
+# add the 1; at the end
+# move all global variables into init and convert them to attributes
+# adjust all tokens
+# fix all functions
+# - if I use this package on itself that would be hilarious.
+# some features that could be added:
+# convert file locations to $UNIVERSAL::systemdir."/data/<file>";
+# needs to be sure to get all instances and to put the attributes in
+# the right order
+# handle all strange cases for $this to $self->This
+# also locate all globals and convert them to attributes (even when
+# they are autovivified)
+# prevent these VVVV
+#  my {$self->F} = $self->F;
+#  $self->C(`cat "{$self->F}"`);
+# my {$self->C} = "insert into categories values (NULL,".$self->Mysql->DBH->quote($catname).",NULL,NULL)";
+# prevent overwriting local variables with attributes
+# try to find a smart way to do this later, using actual parsing, duh!
+
+use Manager::Dialog qw(QueryUser);
+
+use Data::Dumper;
+
+use Class::MethodMaker
+  new_with_init => 'new',
+  get_set       =>
+  [
+
+   qw / Attreplace{$Name} Attributes Attributes->{$L} Attributes->{Join("\N",@M)} Bsubs C Done Execute F Fattributes{$Newname} I L Name Nattr Newname Of Pkgfile Pkgname Regex Subs Subsh Subsh->{$1} Uses Uses->{$L} Uses->{Join("\N",@M)} Values X Y /
+
+  ];
+
+sub init {
+  my ($self,%args) = @_;
+  $self->Nattr($attreplace{$attr});
+  $self->C(join("\n\n",
+       "package {$self->Pkgname};",
+       join("\n",@comments),
+       join("\n",@myuses),
+       join("\n",@nouses),
+       join("\n",
+	    (
+	     "use Class::MethodMaker
+  new_with_init => 'new',
+  get_set       =>
+  [
+
+   qw / ".join(" ", sort keys %fattributes).
+	     " /
+
+  ];",
+	     "",
+	     "sub init {",
+	     "  my (\$self,\%args) = \@_;",
+	     join("\n",@isubs),
+	     "}",
+	     "",
+	     "sub Execute {",
+	     "  my (\$self,\%args) = \@_;",
+	     join("\n",@nsubs),
+	     "}",
+	    )
+	   ),
+       join("\n\n",@subs),
+      ));
+  $self->C(~ s/\$$attr\b/\{\$self->{$self->Nattr}\}/gs);
+  $self->C(`cat "{$self->F}"`);
+  $self->Subs(0);
+  $self->Subs(join("\n",@lines));
+  $self->Done(1);
+  $self->Execute(0);
+  $self->L(shift @lines);
+  $self->L(shift @lines);
+  $self->Regex(join("|",@codebases));
+  $self->Fattributes{$Newname}({$self->Values});
+  $self->C(~ s/sub \$self->$sub /sub $sub /gs);
+  $self->Attributes->{Join("\N",@M)}(1);
+  $self->Pkgname(QueryUser("What is the package name? "));
+  $self->Y($1);
+  $self->Name($2);
+  $self->Bsubs(join("\n",@bsubs));
+  $self->Y(~ s/^\(//);
+  $self->Pkgfile(~ s|::|/|g);
+  $self->C(~ s|$|\n\n1;\n|s);
+  $self->Attributes->{$L}(1);
+  $self->C(~ s/\@{$args{Items}}/\@\{\$args\{Items\}\}/g);
+  $self->Uses->{$L}(1);
+  $self->Execute(1);
+  $self->Done(0);
+  $self->Attreplace{$Name}({$self->Newname});
+  $self->F($ARGV[0]);
+  $self->Subs(1);
+  $self->Uses({});
+  $self->Newname({$self->Name});
+  $self->Values($3);
+  $self->Pkgfile({$self->Pkgname}.".pm");
+  $self->Y(~ s/\)$//);
+  $self->Of($ARGV[1]);
+  $self->Newname(~ s/\b(\w)/\U$1/g);
+  $self->C(~ s/^#!\/usr\/bin\/perl (-w)?//s);
+  $self->Attributes({});
+  $self->Uses->{Join("\N",@M)}(1);
+  $self->Subsh({});
+  $self->C(~ s/\$$attr->/\$self->$self->Nattr->/gs);
+  $self->C(~ s/\b$sub\b/\$self->$sub/gs);
+  $self->Subsh->{$1}(1);
+  $self->I(0);
+  $self->X(shift @lines);
+  $self->L(shift @lines);
+}
+
+sub Execute {
+  my ($self,%args) = @_;
+
+}
+
+
+1;
+

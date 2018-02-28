@@ -1,0 +1,9 @@
+(
+ (Create files and directories, probably with user's permissions,
+  if they do not already exist)
+ ()
+ )
+
+(find all perl scripts listed in my emacs source files and move
+ those scripts into their respective agents for RPC, alter
+ corresponding emacs code.)
